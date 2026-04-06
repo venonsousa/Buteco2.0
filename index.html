@@ -26,22 +26,22 @@
       padding: 10px;
     }
     .cover {
-      width: 150px;
-      height: 150px;
+      width: 100px; /* capa menor */
+      height: 100px;
       margin-right: 15px;
     }
     .cover img {
       width: 100%;
       height: 100%;
       border-radius: 8px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.9);
+      box-shadow: 0 0 15px rgba(0,0,0,0.9);
     }
     .info {
       flex: 1;
       background: rgba(0,0,0,0.6);
       padding: 10px;
       border-radius: 8px;
-      margin-top: 20px; /* desce as informações */
+      margin-top: 20px;
     }
     .controls {
       display: flex;
@@ -53,14 +53,14 @@
       background: #666; /* cinza */
       border: none;
       color: #fff;
-      width: 60px;
-      height: 60px;
+      width: 45px; /* botão menor */
+      height: 45px;
       border-radius: 50%;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
       transition: background 0.3s, transform 0.2s;
-      box-shadow: 0 0 15px rgba(0,0,0,0.8);
+      box-shadow: 0 0 10px rgba(0,0,0,0.8);
     }
     .play-btn:hover {
       background: #999;
@@ -68,18 +68,18 @@
     }
     .volume {
       margin-left: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.7);
+      box-shadow: 0 0 8px rgba(0,0,0,0.7);
     }
     .socials {
       display: flex;
       gap: 10px;
     }
     .socials a img {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       filter: invert(1);
       transition: transform 0.3s ease, filter 0.3s ease;
-      box-shadow: 0 0 10px rgba(0,0,0,0.7);
+      box-shadow: 0 0 8px rgba(0,0,0,0.7);
       border-radius: 50%;
       padding: 3px;
       background: rgba(0,0,0,0.4);
@@ -87,6 +87,12 @@
     .socials a img:hover {
       transform: rotate(15deg) scale(1.2);
       filter: invert(0.5) sepia(1) hue-rotate(200deg);
+    }
+    .datetime {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -114,6 +120,7 @@
         <a href="https://t.me" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/telegram.svg" alt="Telegram"></a>
       </div>
     </div>
+    <div class="datetime" id="datetime"></div>
     <audio id="audio" autoplay>
       <source src="https://stm.igng.com.br:7018/stream" type="audio/mpeg">
       Seu navegador não suporta áudio HTML5.
@@ -154,7 +161,6 @@
 
           $("#capa").attr("src", capa);
           $("#ouvintes").text(ouvintes);
-          // Bitrate fixo 128Kbps
           $("#bitrate").text("128Kbps");
         }
       });
@@ -162,6 +168,17 @@
 
     atualizarInfo();
     setInterval(atualizarInfo, 5000);
+
+    // Atualizar data e hora em tempo real (Horário de Brasília)
+    function atualizarDataHora() {
+      const agora = new Date();
+      const opcoes = { timeZone: "America/Sao_Paulo", hour12: false };
+      const data = agora.toLocaleDateString("pt-BR", opcoes);
+      const hora = agora.toLocaleTimeString("pt-BR", opcoes);
+      document.getElementById("datetime").textContent = `Data: ${data} | Hora: ${hora} (Brasília)`;
+    }
+    atualizarDataHora();
+    setInterval(atualizarDataHora, 1000);
 
     // Bloquear inspeção e ver código-fonte
     document.addEventListener("contextmenu", function(e) {

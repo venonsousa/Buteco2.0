@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Player da Rádio</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     .player {
       width: 733px;
@@ -80,6 +81,8 @@
       <h3 id="titulo">Carregando rádio...</h3>
       <p><strong>Artista:</strong> <span id="artista">--</span></p>
       <p><strong>Música:</strong> <span id="musica">--</span></p>
+      <p><strong>Ouvintes:</strong> <span id="ouvintes">--</span></p>
+      <p><strong>Bitrate:</strong> <span id="bitrate">--</span> kbps</p>
       <div class="controls">
         <button id="playPause" class="play-btn">Play</button>
         <div class="socials">
@@ -110,30 +113,26 @@
       }
     });
 
-    async function carregarInfo() {
-      try {
-        const response = await fetch("http://igng.com.br/api/NzAxOCsx");
-        const text = await response.text();
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(text, "application/xml");
+    function atualizarInfo() {
+      $.getJSON('http://igng.com.br/api-json/NzAxOCsx', function(data) {
+        $("#titulo").text(data.titulo);
 
-        document.getElementById("titulo").textContent =
-          xml.getElementsByTagName("titulo")[0].textContent;
+        // Separar artista e música
+        var partes = data.musica_atual.split(" - ");
+        $("#artista").text(partes[0] || "--");
+        $("#musica").text(partes[1] || "--");
 
-        const musicaAtual = xml.getElementsByTagName("musica_atual")[0].textContent;
-        const partes = musicaAtual.split(" - ");
-        document.getElementById("artista").textContent = partes[0] || "--";
-        document.getElementById("musica").textContent = partes[1] || "--";
+        // Atualizar capa
+        $("#capa").attr("src", data.capa_musica);
 
-        const capa = xml.getElementsByTagName("capa_musica")[0].textContent;
-        document.getElementById("capa").src = capa || "";
-      } catch (e) {
-        console.error("Erro ao carregar API", e);
-      }
+        // Ouvintes e bitrate
+        $("#ouvintes").text(data.ouvintes_conectados);
+        $("#bitrate").text(data.plano_bitrate);
+      });
     }
 
-    carregarInfo();
-    setInterval(carregarInfo, 15000); // atualiza a cada 15s
+    atualizarInfo();
+    setInterval(atualizarInfo, 15000); // atualiza a cada 15s
   </script>
 </body>
 </html>

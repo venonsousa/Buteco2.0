@@ -26,6 +26,10 @@
     .cover img {
       max-width: 100%;
       max-height: 100%;
+      transition: transform 0.3s ease;
+    }
+    .cover img:hover {
+      transform: scale(1.05);
     }
     .info {
       flex: 1;
@@ -45,6 +49,11 @@
       border-radius: 5px;
       cursor: pointer;
       font-size: 16px;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .play-btn:hover {
+      background: #ff7777;
+      transform: scale(1.1);
     }
     .socials {
       display: flex;
@@ -54,6 +63,11 @@
       width: 24px;
       height: 24px;
       filter: invert(1);
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+    .socials a img:hover {
+      transform: scale(1.2);
+      filter: invert(0.5) sepia(1) hue-rotate(200deg);
     }
   </style>
 </head>
@@ -107,13 +121,12 @@
           xml.getElementsByTagName("titulo")[0].textContent;
 
         const musicaAtual = xml.getElementsByTagName("musica_atual")[0].textContent;
-        // Separar artista e música pelo " - "
         const partes = musicaAtual.split(" - ");
         document.getElementById("artista").textContent = partes[0] || "--";
         document.getElementById("musica").textContent = partes[1] || "--";
 
-        document.getElementById("capa").src =
-          xml.getElementsByTagName("capa_musica")[0].textContent;
+        const capa = xml.getElementsByTagName("capa_musica")[0].textContent;
+        document.getElementById("capa").src = capa || "";
       } catch (e) {
         console.error("Erro ao carregar API", e);
       }

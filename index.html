@@ -40,13 +40,13 @@ body {
   color: #fff;
 }
 
-/* FUNDO DINÂMICO DO PLAYER */
+/* FUNDO DINÂMICO */
 .player::before {
   content: "";
   position: absolute;
   width: 100%;
   height: 100%;
-  background: var(--bg-player) center/cover no-repeat;
+  background: var(--bg-player, url('https://picsum.photos/800/500')) center/cover no-repeat;
   filter: blur(15px) brightness(0.4);
   transform: scale(1.2);
   z-index: 0;
@@ -62,7 +62,7 @@ body {
   z-index: 1;
 }
 
-/* CONTEÚDO NA FRENTE */
+/* CONTEÚDO */
 .player > * {
   position: relative;
   z-index: 2;
@@ -79,7 +79,7 @@ body {
   background-position: center;
 }
 
-/* CONTEÚDO */
+/* CONTENT */
 .content {
   padding: 20px;
   flex: 1;
@@ -131,7 +131,7 @@ body {
   padding-right: 50px;
 }
 
-/* ANIMAÇÃO TEXTO */
+/* SCROLL TEXTO */
 .rolando {
   animation: rolarTexto linear infinite alternate;
 }
@@ -257,21 +257,10 @@ body {
 
     <!-- REDES -->
     <div class="redes">
-      <div class="btn-circle" onclick="abrir('https://facebook.com')">
-        <div class="icon-text">f</div>
-      </div>
-
-      <div class="btn-circle" onclick="abrir('https://x.com')">
-        <div class="icon-text">X</div>
-      </div>
-
-      <div class="btn-circle" onclick="abrir('https://t.me')">
-        <div class="icon-text">T</div>
-      </div>
-
-      <div class="btn-circle" onclick="abrir('https://instagram.com')">
-        <div class="icon-text">I</div>
-      </div>
+      <div class="btn-circle" onclick="abrir('https://facebook.com')"><div class="icon-text">f</div></div>
+      <div class="btn-circle" onclick="abrir('https://x.com')"><div class="icon-text">X</div></div>
+      <div class="btn-circle" onclick="abrir('https://t.me')"><div class="icon-text">T</div></div>
+      <div class="btn-circle" onclick="abrir('https://instagram.com')"><div class="icon-text">I</div></div>
     </div>
 
   </div>
@@ -284,7 +273,9 @@ body {
 
 let audio = document.getElementById("audio");
 let btn = document.getElementById("btn");
+let ultimaMusica = "";
 
+/* PLAY */
 audio.onplay = () => btn.classList.add("playing");
 audio.onpause = () => btn.classList.remove("playing");
 
@@ -305,6 +296,24 @@ function atualizarRelogio() {
 setInterval(atualizarRelogio, 1000);
 atualizarRelogio();
 
+/* TEXTO ROLANDO */
+function atualizarTextoMusica(texto) {
+  const el = document.getElementById("musicaTexto");
+
+  el.classList.remove("rolando");
+  el.style.animation = "none";
+  el.innerText = texto;
+
+  setTimeout(() => {
+    const limite = 486;
+    if (el.scrollWidth > limite) {
+      const distancia = el.scrollWidth - limite;
+      el.style.animation = `rolarTexto ${distancia / 40}s linear infinite alternate`;
+      el.classList.add("rolando");
+    }
+  }, 200);
+}
+
 /* API */
 const API = "https://api.codetabs.com/v1/proxy?quest=https://igng.com.br/api-json/VG5wQmVFOUJQVDA9KzM=";
 
@@ -319,24 +328,42 @@ function carregar() {
   fetch(API)
     .then(r => r.json())
     .then(data => {
+
+      if (!data || !data.musica_atual) return;
+
+      if (data.musica_atual === ultimaMusica) return;
+      ultimaMusica = data.musica_atual;
+
       let info = separarMusica(data.musica_atual);
 
-      document.getElementById("radio").innerText = data.titulo;
+      document.getElementById("radio").innerText = data.titulo || "Rádio";
       document.getElementById("artista").innerText = info.artista;
-      document.getElementById("musicaTexto").innerText = info.musica;
-      document.getElementById("ouvintes").innerText = "👥 " + data.ouvintes_conectados;
+      atualizarTextoMusica(info.musica);
 
-      if (data.capa_musica) {
-        document.getElementById("capa").style.backgroundImage = `url(${data.capa_musica})`;
-        document.getElementById("bg").style.backgroundImage = `url(${data.capa_musica})`;
+      document.getElementById("ouvintes").innerText =
+        "👥 " + (data.ouvintes_conectados || 0);
 
-        /* FUNDO PLAYER */
+      document.getElementById("liveStatus").innerHTML =
+        data.musica_atual.includes(" - ")
+          ? ""
+          : '<div class="live">● AO VIVO</div>';
+
+      if (data.capa_musica && data.capa_musica.startsWith("http")) {
+
+        document.getElementById("capa").style.backgroundImage =
+          `url(${data.capa_musica})`;
+
+        document.getElementById("bg").style.backgroundImage =
+          `url(${data.capa_musica})`;
+
         document.getElementById("player").style.setProperty(
           "--bg-player",
           `url(${data.capa_musica})`
         );
       }
-    });
+
+    })
+    .catch(err => console.log("Erro API:", err));
 }
 
 setInterval(carregar, 3000);
@@ -346,6 +373,7 @@ carregar();
 document.addEventListener("mousemove", function(e) {
   const bolinha = document.createElement("div");
   bolinha.className = "particle";
+
   bolinha.style.left = e.clientX + "px";
   bolinha.style.top = e.clientY + "px";
 

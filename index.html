@@ -1,0 +1,363 @@
+<!DOCTYPE html> 
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Player Rádio ULTRA MASTER</title>
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial;
+  background: #000;
+  overflow: hidden;
+}
+
+/* FUNDO GLOBAL */
+.bg {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  filter: blur(40px) brightness(0.4);
+  transform: scale(1.2);
+  background-size: cover;
+  z-index: -1;
+}
+
+/* PLAYER */
+.player {
+  width: 767px;
+  height: 410px;
+  display: flex;
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  color: #fff;
+}
+
+/* FUNDO DINÂMICO DO PLAYER */
+.player::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-player) center/cover no-repeat;
+  filter: blur(15px) brightness(0.4);
+  transform: scale(1.2);
+  z-index: 0;
+}
+
+/* OVERLAY */
+.player::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 1;
+}
+
+/* CONTEÚDO NA FRENTE */
+.player > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* CAPA */
+.capa {
+  width: 198px;
+  height: 216px;
+  margin: 20px;
+  border-radius: 12px;
+  background: #222;
+  background-size: cover;
+  background-position: center;
+}
+
+/* CONTEÚDO */
+.content {
+  padding: 20px;
+  flex: 1;
+}
+
+.radio { opacity: 0.8; }
+
+/* RELÓGIO */
+.relogio {
+  margin-top: 5px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* AO VIVO */
+.live {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background: red;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0.5; }
+}
+
+/* ARTISTA */
+.artista {
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+/* MÚSICA */
+.musica {
+  width: 486px;
+  overflow: hidden;
+  position: relative;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.musica span {
+  display: inline-block;
+  white-space: nowrap;
+  padding-right: 50px;
+}
+
+/* ANIMAÇÃO TEXTO */
+.rolando {
+  animation: rolarTexto linear infinite alternate;
+}
+
+@keyframes rolarTexto {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-100% + 486px)); }
+}
+
+/* OUVINTES */
+.ouvintes {
+  margin-top: 10px;
+}
+
+/* BOTÕES */
+.btn-circle {
+  width: 60px;
+  height: 60px;
+  margin-top: 20px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-circle:hover {
+  transform: scale(1.1);
+}
+
+/* PLAY */
+.icon {
+  width: 0;
+  height: 0;
+  border-left: 14px solid #fff;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+}
+
+.playing .icon {
+  width: 14px;
+  height: 18px;
+  border: none;
+  position: relative;
+}
+
+.playing .icon::before,
+.playing .icon::after {
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 100%;
+  background: #fff;
+}
+
+.playing .icon::before { left: 0; }
+.playing .icon::after { right: 0; }
+
+/* REDES */
+.redes {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.icon-text {
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* PARTÍCULAS */
+.particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 0 8px rgba(255,255,255,0.6);
+  animation: subir 1s ease-out forwards;
+}
+
+@keyframes subir {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-50px) scale(0.3); opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg" id="bg"></div>
+
+<div class="player" id="player">
+
+  <div class="capa" id="capa"></div>
+
+  <div class="content">
+    <div class="radio" id="radio">Carregando...</div>
+
+    <div class="relogio">
+      <span id="hora"></span> • 
+      <span id="data"></span>
+    </div>
+
+    <div id="liveStatus"></div>
+
+    <div class="artista" id="artista">---</div>
+
+    <div class="musica">
+      <span id="musicaTexto">---</span>
+    </div>
+
+    <div class="ouvintes" id="ouvintes">👥 0</div>
+
+    <!-- PLAY -->
+    <div class="btn-circle" onclick="togglePlay()" id="btn">
+      <div class="icon"></div>
+    </div>
+
+    <!-- REDES -->
+    <div class="redes">
+      <div class="btn-circle" onclick="abrir('https://facebook.com')">
+        <div class="icon-text">f</div>
+      </div>
+
+      <div class="btn-circle" onclick="abrir('https://x.com')">
+        <div class="icon-text">X</div>
+      </div>
+
+      <div class="btn-circle" onclick="abrir('https://t.me')">
+        <div class="icon-text">T</div>
+      </div>
+
+      <div class="btn-circle" onclick="abrir('https://instagram.com')">
+        <div class="icon-text">I</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<audio id="audio" src="https://stm.igng.com.br:7018/stream"></audio>
+
+<script>
+
+let audio = document.getElementById("audio");
+let btn = document.getElementById("btn");
+
+audio.onplay = () => btn.classList.add("playing");
+audio.onpause = () => btn.classList.remove("playing");
+
+function togglePlay() {
+  audio.paused ? audio.play() : audio.pause();
+}
+
+function abrir(url){
+  window.open(url, "_blank");
+}
+
+/* RELÓGIO */
+function atualizarRelogio() {
+  const agora = new Date();
+  document.getElementById("hora").innerText = agora.toLocaleTimeString('pt-BR');
+  document.getElementById("data").innerText = agora.toLocaleDateString('pt-BR');
+}
+setInterval(atualizarRelogio, 1000);
+atualizarRelogio();
+
+/* API */
+const API = "https://api.codetabs.com/v1/proxy?quest=https://igng.com.br/api-json/VG5wQmVFOUJQVDA9KzM=";
+
+function separarMusica(texto) {
+  let partes = texto.split(" - ");
+  return partes.length >= 2
+    ? { artista: partes[0], musica: partes.slice(1).join(" - ") }
+    : { artista: "AO VIVO", musica: texto };
+}
+
+function carregar() {
+  fetch(API)
+    .then(r => r.json())
+    .then(data => {
+      let info = separarMusica(data.musica_atual);
+
+      document.getElementById("radio").innerText = data.titulo;
+      document.getElementById("artista").innerText = info.artista;
+      document.getElementById("musicaTexto").innerText = info.musica;
+      document.getElementById("ouvintes").innerText = "👥 " + data.ouvintes_conectados;
+
+      if (data.capa_musica) {
+        document.getElementById("capa").style.backgroundImage = `url(${data.capa_musica})`;
+        document.getElementById("bg").style.backgroundImage = `url(${data.capa_musica})`;
+
+        /* FUNDO PLAYER */
+        document.getElementById("player").style.setProperty(
+          "--bg-player",
+          `url(${data.capa_musica})`
+        );
+      }
+    });
+}
+
+setInterval(carregar, 3000);
+carregar();
+
+/* PARTÍCULAS */
+document.addEventListener("mousemove", function(e) {
+  const bolinha = document.createElement("div");
+  bolinha.className = "particle";
+  bolinha.style.left = e.clientX + "px";
+  bolinha.style.top = e.clientY + "px";
+
+  let size = Math.random() * 4 + 4;
+  bolinha.style.width = size + "px";
+  bolinha.style.height = size + "px";
+
+  document.body.appendChild(bolinha);
+  setTimeout(() => bolinha.remove(), 1000);
+});
+
+</script>
+
+</body>
+</html>

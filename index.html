@@ -40,7 +40,6 @@ body {
   color: #fff;
 }
 
-/* FUNDO DINÂMICO */
 .player::before {
   content: "";
   position: absolute;
@@ -52,7 +51,6 @@ body {
   z-index: 0;
 }
 
-/* OVERLAY */
 .player::after {
   content: "";
   position: absolute;
@@ -62,7 +60,6 @@ body {
   z-index: 1;
 }
 
-/* CONTEÚDO */
 .player > * {
   position: relative;
   z-index: 2;
@@ -79,7 +76,7 @@ body {
   background-position: center;
 }
 
-/* CONTENT */
+/* CONTEÚDO */
 .content {
   padding: 20px;
   flex: 1;
@@ -114,6 +111,7 @@ body {
 .artista {
   margin-top: 10px;
   font-size: 18px;
+  opacity: 0.8;
 }
 
 /* MÚSICA */
@@ -121,7 +119,7 @@ body {
   width: 486px;
   overflow: hidden;
   position: relative;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: bold;
 }
 
@@ -131,7 +129,7 @@ body {
   padding-right: 50px;
 }
 
-/* SCROLL TEXTO */
+/* SCROLL */
 .rolando {
   animation: rolarTexto linear infinite alternate;
 }
@@ -146,7 +144,7 @@ body {
   margin-top: 10px;
 }
 
-/* BOTÕES */
+/* BOTÃO PLAY */
 .btn-circle {
   width: 60px;
   height: 60px;
@@ -159,14 +157,35 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+
+/* 🔽 BOTÕES MENORES (REDES) */
+.btn-social {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   transition: 0.2s;
 }
 
-.btn-circle:hover {
-  transform: scale(1.1);
+.btn-social:hover {
+  transform: scale(1.15);
 }
 
-/* PLAY */
+/* Ícones */
+.icon-text {
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* PLAY ICON */
 .icon {
   width: 0;
   height: 0;
@@ -197,14 +216,8 @@ body {
 /* REDES */
 .redes {
   display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.icon-text {
-  color: #fff;
-  font-size: 18px;
-  font-weight: bold;
+  gap: 8px;
+  margin-top: 15px;
 }
 
 /* PARTÍCULAS */
@@ -213,7 +226,6 @@ body {
   border-radius: 50%;
   pointer-events: none;
   background: rgba(255,255,255,0.9);
-  box-shadow: 0 0 8px rgba(255,255,255,0.6);
   animation: subir 1s ease-out forwards;
 }
 
@@ -255,12 +267,12 @@ body {
       <div class="icon"></div>
     </div>
 
-    <!-- REDES -->
+    <!-- REDES MENORES -->
     <div class="redes">
-      <div class="btn-circle" onclick="abrir('https://facebook.com')"><div class="icon-text">f</div></div>
-      <div class="btn-circle" onclick="abrir('https://x.com')"><div class="icon-text">X</div></div>
-      <div class="btn-circle" onclick="abrir('https://t.me')"><div class="icon-text">T</div></div>
-      <div class="btn-circle" onclick="abrir('https://instagram.com')"><div class="icon-text">I</div></div>
+      <div class="btn-social" onclick="abrir('https://facebook.com')"><div class="icon-text">f</div></div>
+      <div class="btn-social" onclick="abrir('https://x.com')"><div class="icon-text">X</div></div>
+      <div class="btn-social" onclick="abrir('https://t.me')"><div class="icon-text">T</div></div>
+      <div class="btn-social" onclick="abrir('https://instagram.com')"><div class="icon-text">I</div></div>
     </div>
 
   </div>
@@ -314,15 +326,29 @@ function atualizarTextoMusica(texto) {
   }, 200);
 }
 
+/* SEPARAR ARTISTA/MÚSICA */
+function separarMusica(texto) {
+  if (!texto || texto.trim() === "") {
+    return { artista: "Desconhecido", musica: "Sem informações" };
+  }
+
+  let partes = texto.split(" - ");
+
+  if (partes.length >= 2) {
+    return {
+      artista: partes[0].trim(),
+      musica: partes.slice(1).join(" - ").trim()
+    };
+  }
+
+  return {
+    artista: "AO VIVO",
+    musica: texto.trim()
+  };
+}
+
 /* API */
 const API = "https://api.codetabs.com/v1/proxy?quest=https://igng.com.br/api-json/VG5wQmVFOUJQVDA9KzM=";
-
-function separarMusica(texto) {
-  let partes = texto.split(" - ");
-  return partes.length >= 2
-    ? { artista: partes[0], musica: partes.slice(1).join(" - ") }
-    : { artista: "AO VIVO", musica: texto };
-}
 
 function carregar() {
   fetch(API)
@@ -349,17 +375,9 @@ function carregar() {
           : '<div class="live">● AO VIVO</div>';
 
       if (data.capa_musica && data.capa_musica.startsWith("http")) {
-
-        document.getElementById("capa").style.backgroundImage =
-          `url(${data.capa_musica})`;
-
-        document.getElementById("bg").style.backgroundImage =
-          `url(${data.capa_musica})`;
-
-        document.getElementById("player").style.setProperty(
-          "--bg-player",
-          `url(${data.capa_musica})`
-        );
+        document.getElementById("capa").style.backgroundImage = `url(${data.capa_musica})`;
+        document.getElementById("bg").style.backgroundImage = `url(${data.capa_musica})`;
+        document.getElementById("player").style.setProperty("--bg-player", `url(${data.capa_musica})`);
       }
 
     })

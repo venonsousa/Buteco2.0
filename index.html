@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Player Rádio ULTRA MASTER</title>
+<title>Player Rádio</title>
 
 <style>
 body {
@@ -27,24 +27,6 @@ body {
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(20px);
   color: #fff;
-  position: relative;
-}
-
-/* FUNDO DINÂMICO */
-.player::before {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: var(--bg-player, url('https://picsum.photos/800/500')) center/cover;
-  filter: blur(20px) brightness(0.3);
-  transform: scale(1.2);
-  z-index: 0;
-}
-
-.player > * {
-  position: relative;
-  z-index: 2;
 }
 
 /* CAPA GIRANDO */
@@ -55,9 +37,8 @@ body {
   border-radius: 50%;
   background-size: cover;
   background-position: center;
-  animation: girar 8s linear infinite;
+  animation: girar 10s linear infinite;
   animation-play-state: paused;
-  box-shadow: 0 0 25px rgba(0,0,0,0.6);
 }
 
 @keyframes girar {
@@ -69,10 +50,9 @@ body {
   animation-play-state: running;
 }
 
-/* CONTEÚDO */
+/* TEXTO */
 .content {
   padding: 20px;
-  flex: 1;
 }
 
 .artista {
@@ -92,7 +72,7 @@ body {
   margin-top: 5px;
 }
 
-/* PLAY */
+/* BOTÃO */
 .btn {
   width: 70px;
   height: 70px;
@@ -132,38 +112,6 @@ body {
 .playing .icon::before { left: 0; }
 .playing .icon::after { right: 0; }
 
-/* REDES (MENOR) */
-.redes {
-  display: flex;
-  gap: 8px;
-  margin-top: 20px;
-}
-
-.btn-social {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-/* PARTÍCULAS */
-.particle {
-  position: fixed;
-  width: 5px;
-  height: 5px;
-  background: #fff;
-  border-radius: 50%;
-  animation: subir 1s forwards;
-}
-
-@keyframes subir {
-  to { transform: translateY(-50px); opacity: 0; }
-}
 </style>
 </head>
 
@@ -175,20 +123,12 @@ body {
 
   <div class="content">
     <div class="artista" id="artista">Carregando...</div>
-    <div class="musica" id="musica">---</div>
+    <div class="musica" id="musica">Carregando música...</div>
     <div class="album" id="album">---</div>
 
     <div class="btn" onclick="togglePlay()" id="btn">
       <div class="icon"></div>
     </div>
-
-    <div class="redes">
-      <div class="btn-social" onclick="abrir('https://facebook.com')">f</div>
-      <div class="btn-social" onclick="abrir('https://x.com')">X</div>
-      <div class="btn-social" onclick="abrir('https://t.me')">T</div>
-      <div class="btn-social" onclick="abrir('https://instagram.com')">I</div>
-    </div>
-
   </div>
 
 </div>
@@ -199,7 +139,6 @@ body {
 
 let audio = document.getElementById("audio");
 let player = document.getElementById("player");
-let ultimaMusica = "";
 
 /* PLAY */
 function togglePlay() {
@@ -209,25 +148,16 @@ function togglePlay() {
 audio.onplay = () => player.classList.add("playing");
 audio.onpause = () => player.classList.remove("playing");
 
-/* ABRIR LINKS */
-function abrir(url){
-  window.open(url, "_blank");
-}
-
 /* APIs */
 const API_JSON = "https://api.codetabs.com/v1/proxy?quest=https://igng.com.br/api-json/VG5wQmVFOUJQVDA9KzM=";
 const API_XML = "https://api.codetabs.com/v1/proxy?quest=http://igng.com.br/api/TnpBeE9BPT0rWg==";
-const API_JSON_FALLBACK = "https://api.codetabs.com/v1/proxy?quest=http://igng.com.br/api-json/TnpBeE9BPT0rWg==";
+const API_FALLBACK = "https://api.codetabs.com/v1/proxy?quest=http://igng.com.br/api-json/TnpBeE9BPT0rWg==";
 
-/* ATUALIZAR PLAYER */
-function atualizarPlayer(artista, musica, album) {
-
-  if (musica === ultimaMusica) return;
-  ultimaMusica = musica;
-
-  document.getElementById("artista").innerText = artista || "---";
-  document.getElementById("musica").innerText = musica || "---";
-  document.getElementById("album").innerText = "💿 " + (album || "---");
+/* ATUALIZA PLAYER */
+function atualizar(artista, musica, album) {
+  document.getElementById("artista").innerText = artista || "AO VIVO";
+  document.getElementById("musica").innerText = musica || "Transmissão ao vivo";
+  document.getElementById("album").innerText = album ? "💿 " + album : "";
 }
 
 /* CAPA */
@@ -236,10 +166,11 @@ function carregarCapa() {
     .then(r => r.json())
     .then(data => {
       if (data.capa_musica) {
-        document.getElementById("capa").style.backgroundImage = `url(${data.capa_musica})`;
-        document.getElementById("player").style.setProperty("--bg-player", `url(${data.capa_musica})`);
+        document.getElementById("capa").style.backgroundImage =
+          `url(${data.capa_musica})`;
       }
-    });
+    })
+    .catch(()=>{});
 }
 
 /* INFO COM FALLBACK */
@@ -251,31 +182,31 @@ function carregarInfo() {
 
       let xml = new DOMParser().parseFromString(str, "text/xml");
 
-      let artista = xml.getElementsByTagName("artista")[0]?.textContent;
-      let musica  = xml.getElementsByTagName("musica")[0]?.textContent;
-      let album   = xml.getElementsByTagName("album")[0]?.textContent;
+      let artista = xml.querySelector("artista")?.textContent;
+      let musica  = xml.querySelector("musica")?.textContent;
+      let album   = xml.querySelector("album")?.textContent;
 
-      if (musica && musica !== "") {
-        atualizarPlayer(artista, musica, album);
+      if (musica) {
+        atualizar(artista, musica, album);
       } else {
-        throw "XML vazio";
+        throw "erro";
       }
 
     })
     .catch(() => {
 
-      fetch(API_JSON_FALLBACK)
+      fetch(API_FALLBACK)
         .then(r => r.json())
         .then(data => {
 
           let texto = data.musica_atual || "";
+
           let partes = texto.split(" - ");
 
           let artista = partes[0] || "AO VIVO";
           let musica  = partes[1] || texto;
-          let album   = data.album || "---";
 
-          atualizarPlayer(artista, musica, album);
+          atualizar(artista, musica, data.album);
         });
 
     });
@@ -289,16 +220,6 @@ setInterval(() => {
 
 carregarCapa();
 carregarInfo();
-
-/* PARTÍCULAS */
-document.addEventListener("mousemove", e => {
-  let p = document.createElement("div");
-  p.className = "particle";
-  p.style.left = e.clientX + "px";
-  p.style.top = e.clientY + "px";
-  document.body.appendChild(p);
-  setTimeout(()=>p.remove(),1000);
-});
 
 </script>
 

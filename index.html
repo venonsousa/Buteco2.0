@@ -19,7 +19,6 @@
       font-family: Arial, sans-serif;
       position: relative;
       box-sizing: border-box;
-      cursor: none; /* esconde o cursor padrão dentro do player */
     }
     .top {
       display: flex;
@@ -128,19 +127,22 @@
       text-shadow: 0 0 10px #fff;
     }
 
-    /* Bolinha que segue o mouse */
-    .cursor-efeito {
-      position: fixed;
-      width: 15px;
-      height: 15px;
-      background: #fff;
+    /* ✨ Brilho na ponta do mouse */
+    .spark {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: radial-gradient(circle, #fff, transparent);
       border-radius: 50%;
       pointer-events: none;
-      mix-blend-mode: difference;
-      transform: translate(-50%, -50%);
-      transition: transform 0.1s ease;
-      z-index: 9999;
-      display: none; /* só aparece dentro do player */
+      animation: fade 0.6s forwards;
+      box-shadow: 0 0 10px #fff, 0 0 20px #0ff, 0 0 30px #0ff;
+    }
+    @keyframes fade {
+      to {
+        opacity: 0;
+        transform: scale(2);
+      }
     }
   </style>
 </head>
@@ -178,15 +180,10 @@
     </audio>
   </div>
 
-  <!-- Bolinha do cursor -->
-  <div class="cursor-efeito" id="cursor"></div>
-
   <script>
     const audio = document.getElementById("audio");
     const playPauseBtn = document.getElementById("playPause");
     const volumeSlider = document.getElementById("volume");
-    const cursor = document.getElementById("cursor");
-    const player = document.getElementById("player");
 
     playPauseBtn.addEventListener("click", () => {
       if (audio.paused) {
@@ -229,7 +226,9 @@
     function atualizarDataHora() {
       const agora = new Date();
       const opcoes = { timeZone: "America/Sao_Paulo", hour12: false };
-      const data =Aqui está o código **completo e integrado**: o player da rádio, o efeito de cursor personalizado e a bolinha animada que segue o mouse **apenas dentro da área do player**.  
+      const data = agora.toLocaleDateString("pt-BR", opcoes);
+      const hora = agora.toLocaleTimeString("pt-BR", opcoes);
+      document.getElementById("datetime").textContent = `Data: ${data} |Aqui está o seu código completo já com o **efeito de brilho na ponta do mouse** integrado e funcionando junto ao *Player da Rádio*. Basta copiar e colar:
 
 ```html
 <!DOCTYPE html>
@@ -253,7 +252,6 @@
       font-family: Arial, sans-serif;
       position: relative;
       box-sizing: border-box;
-      cursor: none; /* esconde o cursor padrão dentro do player */
     }
     .top {
       display: flex;
@@ -362,19 +360,22 @@
       text-shadow: 0 0 10px #fff;
     }
 
-    /* Bolinha que segue o mouse */
-    .cursor-efeito {
-      position: fixed;
-      width: 15px;
-      height: 15px;
-      background: #fff;
+    /* ✨ Brilho na ponta do mouse */
+    .spark {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: radial-gradient(circle, #fff, transparent);
       border-radius: 50%;
       pointer-events: none;
-      mix-blend-mode: difference;
-      transform: translate(-50%, -50%);
-      transition: transform 0.1s ease;
-      z-index: 9999;
-      display: none; /* só aparece dentro do player */
+      animation: fade 0.6s forwards;
+      box-shadow: 0 0 10px #fff, 0 0 20px #0ff, 0 0 30px #0ff;
+    }
+    @keyframes fade {
+      to {
+        opacity: 0;
+        transform: scale(2);
+      }
     }
   </style>
 </head>
@@ -412,15 +413,10 @@
     </audio>
   </div>
 
-  <!-- Bolinha do cursor -->
-  <div class="cursor-efeito" id="cursor"></div>
-
   <script>
     const audio = document.getElementById("audio");
     const playPauseBtn = document.getElementById("playPause");
     const volumeSlider = document.getElementById("volume");
-    const cursor = document.getElementById("cursor");
-    const player = document.getElementById("player");
 
     playPauseBtn.addEventListener("click", () => {
       if (audio.paused) {
@@ -463,4 +459,6 @@
     function atualizarDataHora() {
       const agora = new Date();
       const opcoes = { timeZone: "America/Sao_Paulo", hour12: false };
-      const data = agora.toLocaleDateString("pt-B
+      const data = agora.toLocaleDateString("pt-BR", opcoes);
+      const hora = agora.toLocaleTimeString("pt-BR", opcoes);
+      document.getElementById("datetime").textContent = `Data: ${data}

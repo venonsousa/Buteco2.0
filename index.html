@@ -33,6 +33,9 @@
       border-radius: 8px;
       box-shadow: 0 0 15px rgba(0,0,0,0.7);
     }
+    .cover img:hover {
+      transform: scale(1.05);
+    }
     .info {
       flex: 2;
       padding: 20px;
@@ -111,7 +114,6 @@
   <script>
     const audio = document.getElementById("audio");
     const playPauseBtn = document.getElementById("playPause");
-    const capa = document.getElementById("capa");
 
     playPauseBtn.addEventListener("click", () => {
       if (audio.paused) {
@@ -123,55 +125,32 @@
       }
     });
 
-    // Atualiza info da rádio e busca capa no Apple Music
     function atualizarInfo() {
       $.ajax({
         url: 'https://igng.com.br/api/NzAxOCsx',
         dataType: 'xml',
-        success: async function(xml) {
+        success: function(xml) {
           const titulo = $(xml).find('titulo').text();
           const musicaAtual = $(xml).find('musica_atual').text();
+          const capa = $(xml).find('capa_musica').text();
           const ouvintes = $(xml).find('ouvintes_conectados').text();
           const bitrate = $(xml).find('plano_bitrate').text();
 
           $("#titulo").text(titulo);
 
           const partes = musicaAtual.split(" - ");
-          const artista = partes[0] || "--";
-          const musica = partes[1] || "--";
-          $("#artista").text(artista);
-          $("#musica").text(musica);
+          $("#artista").text(partes[0] || "--");
+          $("#musica").text(partes[1] || "--");
+
+          $("#capa").attr("src", capa);
           $("#ouvintes").text(ouvintes);
           $("#bitrate").text(bitrate);
-
-          // Buscar capa oficial no iTunes API
-          try {
-            const response = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(musica + " " + artista)}&entity=song&limit=1`);
-            const data = await response.json();
-            if (data.results.length > 0) {
-              const artwork = data.results[0].artworkUrl100.replace("100x100", "600x600");
-              $("#capa").attr("src", artwork);
-            }
-          } catch (err) {
-            console.error("Erro ao buscar capa Apple Music", err);
-          }
         }
       });
     }
 
     atualizarInfo();
     setInterval(atualizarInfo, 5000);
-
-    // Interação com mouse na capa (efeito 3D)
-    capa.addEventListener("mousemove", (e) => {
-      const rect = capa.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      capa.style.transform = `scale(1.05) rotateY(${(x/rect.width - 0.5)*20}deg) rotateX(${(y/rect.height - 0.5)*20}deg)`;
-    });
-    capa.addEventListener("mouseleave", () => {
-      capa.style.transform = "scale(1)";
-    });
   </script>
 </body>
 </html>

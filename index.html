@@ -77,18 +77,6 @@
       transform: scale(1.2);
       filter: invert(0.5) sepia(1) hue-rotate(200deg);
     }
-    /* Notas musicais animadas */
-    .note {
-      position: absolute;
-      font-size: 22px;
-      color: #ffcc00;
-      animation: floatUp 1.8s ease-out forwards;
-      pointer-events: none;
-    }
-    @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0) scale(1); }
-      100% { opacity: 0; transform: translateY(-100px) scale(1.4); }
-    }
   </style>
 </head>
 <body>
@@ -121,7 +109,6 @@
   <script>
     const audio = document.getElementById("audio");
     const playPauseBtn = document.getElementById("playPause");
-    const player = document.getElementById("player");
 
     playPauseBtn.addEventListener("click", () => {
       if (audio.paused) {
@@ -159,18 +146,6 @@
 
     atualizarInfo();
     setInterval(atualizarInfo, 15000);
-
-    // Notas musicais no cursor
-    player.addEventListener("mousemove", function(e) {
-      const note = document.createElement("div");
-      note.className = "note";
-      note.style.left = e.offsetX + "px";
-      note.style.top = e.offsetY + "px";
-      const notas = ["♪", "♫", "♬"];
-      note.textContent = notas[Math.floor(Math.random() * notas.length)];
-      player.appendChild(note);
-      setTimeout(() => note.remove(), 1800);
-    });
   </script>
 </body>
 </html>

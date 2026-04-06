@@ -80,14 +80,14 @@
     /* Notas musicais animadas */
     .note {
       position: absolute;
-      font-size: 24px;
+      font-size: 22px;
       color: #ffcc00;
-      animation: floatUp 2s ease-out forwards;
+      animation: floatUp 1.8s ease-out forwards;
       pointer-events: none;
     }
     @keyframes floatUp {
       0% { opacity: 1; transform: translateY(0) scale(1); }
-      100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
+      100% { opacity: 0; transform: translateY(-100px) scale(1.4); }
     }
   </style>
 </head>
@@ -134,31 +134,42 @@
     });
 
     function atualizarInfo() {
-      $.getJSON('http://igng.com.br/api-json/NzAxOCsx', function(data) {
-        $("#titulo").text(data.titulo);
+      $.ajax({
+        url: 'http://igng.com.br/api/NzAxOCsx',
+        dataType: 'xml',
+        success: function(xml) {
+          const titulo = $(xml).find('titulo').text();
+          const musicaAtual = $(xml).find('musica_atual').text();
+          const capa = $(xml).find('capa_musica').text();
+          const ouvintes = $(xml).find('ouvintes_conectados').text();
+          const bitrate = $(xml).find('plano_bitrate').text();
 
-        var partes = data.musica_atual.split(" - ");
-        $("#artista").text(partes[0] || "--");
-        $("#musica").text(partes[1] || "--");
+          $("#titulo").text(titulo);
 
-        $("#capa").attr("src", data.capa_musica);
-        $("#ouvintes").text(data.ouvintes_conectados);
-        $("#bitrate").text(data.plano_bitrate);
+          const partes = musicaAtual.split(" - ");
+          $("#artista").text(partes[0] || "--");
+          $("#musica").text(partes[1] || "--");
+
+          $("#capa").attr("src", capa);
+          $("#ouvintes").text(ouvintes);
+          $("#bitrate").text(bitrate);
+        }
       });
     }
 
     atualizarInfo();
     setInterval(atualizarInfo, 15000);
 
-    // Efeito de notas musicais no cursor
+    // Notas musicais no cursor
     player.addEventListener("mousemove", function(e) {
       const note = document.createElement("div");
       note.className = "note";
       note.style.left = e.offsetX + "px";
       note.style.top = e.offsetY + "px";
-      note.textContent = "♪";
+      const notas = ["♪", "♫", "♬"];
+      note.textContent = notas[Math.floor(Math.random() * notas.length)];
       player.appendChild(note);
-      setTimeout(() => note.remove(), 2000);
+      setTimeout(() => note.remove(), 1800);
     });
   </script>
 </body>

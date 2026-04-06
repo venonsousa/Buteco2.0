@@ -12,7 +12,7 @@
       border-radius: 10px;
       overflow: hidden;
       display: flex;
-      flex-direction: column;
+      flex-direction: row; /* capa à esquerda, info à direita */
       background: url('https://xatimg.com/image/EMsDSWDlogLy.png') no-repeat center center;
       background-size: cover;
       color: #fff;
@@ -20,16 +20,15 @@
       position: relative;
     }
     .cover {
-      flex: 2;
+      flex: 1;
       background: rgba(0,0,0,0.5);
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
     }
     .cover img {
-      max-width: 100%;
-      max-height: 100%;
+      max-width: 90%;
+      max-height: 90%;
       transition: transform 0.3s ease;
       border-radius: 8px;
       box-shadow: 0 0 15px rgba(0,0,0,0.7);
@@ -38,25 +37,30 @@
       transform: scale(1.05);
     }
     .info {
-      flex: 1;
-      padding: 10px;
+      flex: 2;
+      padding: 20px;
       background: rgba(0,0,0,0.6);
-      border-top: 1px solid #444;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
     .controls {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 10px;
+      margin-top: 20px;
     }
+    /* Novo botão circular play/pause */
     .play-btn {
       background: #ff4444;
       border: none;
       color: #fff;
-      padding: 10px 20px;
-      border-radius: 5px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 18px;
+      font-weight: bold;
       transition: background 0.3s, transform 0.2s;
     }
     .play-btn:hover {
@@ -85,13 +89,15 @@
       <img id="capa" src="" alt="Capa da música">
     </div>
     <div class="info">
-      <h3 id="titulo">Carregando rádio...</h3>
-      <p><strong>Artista:</strong> <span id="artista">--</span></p>
-      <p><strong>Música:</strong> <span id="musica">--</span></p>
-      <p><strong>Ouvintes:</strong> <span id="ouvintes">--</span></p>
-      <p><strong>Bitrate:</strong> <span id="bitrate">--</span> kbps</p>
+      <div>
+        <h3 id="titulo">Carregando rádio...</h3>
+        <p><strong>Artista:</strong> <span id="artista">--</span></p>
+        <p><strong>Música:</strong> <span id="musica">--</span></p>
+        <p><strong>Ouvintes:</strong> <span id="ouvintes">--</span></p>
+        <p><strong>Bitrate:</strong> <span id="bitrate">--</span> kbps</p>
+      </div>
       <div class="controls">
-        <button id="playPause" class="play-btn">Play</button>
+        <button id="playPause" class="play-btn">▶</button>
         <div class="socials">
           <a href="https://instagram.com" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/instagram.svg" alt="Instagram"></a>
           <a href="https://facebook.com" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/facebook.svg" alt="Facebook"></a>
@@ -113,10 +119,10 @@
     playPauseBtn.addEventListener("click", () => {
       if (audio.paused) {
         audio.play();
-        playPauseBtn.textContent = "Pause";
+        playPauseBtn.textContent = "❚❚"; // pausa
       } else {
         audio.pause();
-        playPauseBtn.textContent = "Play";
+        playPauseBtn.textContent = "▶"; // play
       }
     });
 

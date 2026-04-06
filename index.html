@@ -25,6 +25,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
     .cover img {
       max-width: 100%;
@@ -76,10 +77,22 @@
       transform: scale(1.2);
       filter: invert(0.5) sepia(1) hue-rotate(200deg);
     }
+    /* Notas musicais animadas */
+    .note {
+      position: absolute;
+      font-size: 24px;
+      color: #ffcc00;
+      animation: floatUp 2s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
+    }
   </style>
 </head>
 <body>
-  <div class="player">
+  <div class="player" id="player">
     <div class="cover">
       <img id="capa" src="" alt="Capa da música">
     </div>
@@ -108,6 +121,7 @@
   <script>
     const audio = document.getElementById("audio");
     const playPauseBtn = document.getElementById("playPause");
+    const player = document.getElementById("player");
 
     playPauseBtn.addEventListener("click", () => {
       if (audio.paused) {
@@ -135,6 +149,17 @@
 
     atualizarInfo();
     setInterval(atualizarInfo, 15000);
+
+    // Efeito de notas musicais no cursor
+    player.addEventListener("mousemove", function(e) {
+      const note = document.createElement("div");
+      note.className = "note";
+      note.style.left = e.offsetX + "px";
+      note.style.top = e.offsetY + "px";
+      note.textContent = "♪";
+      player.appendChild(note);
+      setTimeout(() => note.remove(), 2000);
+    });
   </script>
 </body>
 </html>

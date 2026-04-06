@@ -1,178 +1,126 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rádio Player PRO</title>
-
-<style>
-body {
-  margin: 0;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #0f0f0f;
-  font-family: Arial;
-}
-
-.player {
-  width: 320px;
-  padding: 20px;
-  border-radius: 20px;
-  text-align: center;
-  color: #fff;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
-}
-
-.capa {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin: auto;
-  animation: girar 12s linear infinite;
-}
-
-.capa img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-@keyframes girar {
-  from { transform: rotate(0); }
-  to { transform: rotate(360deg); }
-}
-
-#artista {
-  font-size: 14px;
-  opacity: 0.7;
-  margin-top: 10px;
-}
-
-#musica {
-  font-weight: bold;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.marquee {
-  display: inline-block;
-  padding-left: 100%;
-  animation: marquee 10s linear infinite;
-}
-
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-
-button {
-  margin-top: 15px;
-  padding: 10px 20px;
-  border-radius: 30px;
-  border: none;
-  background: #00ffcc;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.stats {
-  margin-top: 10px;
-  font-size: 12px;
-  opacity: 0.7;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Player da Rádio</title>
+  <style>
+    .player {
+      width: 733px;
+      height: 459px;
+      border: 2px solid #333;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    .cover {
+      flex: 2;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cover img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    .info {
+      flex: 1;
+      padding: 10px;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .play-btn {
+      background: #ff4444;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .socials {
+      display: flex;
+      gap: 10px;
+    }
+    .socials a img {
+      width: 24px;
+      height: 24px;
+      filter: invert(1);
+    }
+  </style>
 </head>
-
 <body>
-
-<div class="player">
-
-  <div class="capa">
-    <img id="cover" src="https://via.placeholder.com/300">
+  <div class="player">
+    <div class="cover">
+      <img id="capa" src="" alt="Capa da música">
+    </div>
+    <div class="info">
+      <h3 id="titulo">Carregando rádio...</h3>
+      <p><strong>Artista:</strong> <span id="artista">--</span></p>
+      <p><strong>Música:</strong> <span id="musica">--</span></p>
+      <div class="controls">
+        <button id="playPause" class="play-btn">Play</button>
+        <div class="socials">
+          <a href="https://instagram.com" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/instagram.svg" alt="Instagram"></a>
+          <a href="https://facebook.com" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/facebook.svg" alt="Facebook"></a>
+          <a href="https://x.com" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/x.svg" alt="X"></a>
+          <a href="https://t.me" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/telegram.svg" alt="Telegram"></a>
+        </div>
+      </div>
+      <audio id="audio" autoplay>
+        <source src="https://stm.igng.com.br:7018/stream" type="audio/mpeg">
+        Seu navegador não suporta áudio HTML5.
+      </audio>
+    </div>
   </div>
 
-  <div id="artista">Artista</div>
-  <div id="musica"><span class="marquee">Carregando...</span></div>
+  <script>
+    const audio = document.getElementById("audio");
+    const playPauseBtn = document.getElementById("playPause");
 
-  <button onclick="togglePlay()" id="btn">▶️ Play</button>
+    playPauseBtn.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+        playPauseBtn.textContent = "Pause";
+      } else {
+        audio.pause();
+        playPauseBtn.textContent = "Play";
+      }
+    });
 
-  <div class="stats">
-    <div>Status: <span id="status">--</span></div>
-    <div>Ouvintes: <span id="ouvintes">0</span></div>
-  </div>
+    async function carregarInfo() {
+      try {
+        const response = await fetch("http://igng.com.br/api/NzAxOCsx");
+        const text = await response.text();
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(text, "application/xml");
 
-</div>
+        document.getElementById("titulo").textContent =
+          xml.getElementsByTagName("titulo")[0].textContent;
 
-<audio id="audio" src="https://stm.igng.com.br:7018/stream"></audio>
+        const musicaAtual = xml.getElementsByTagName("musica_atual")[0].textContent;
+        // Separar artista e música pelo " - "
+        const partes = musicaAtual.split(" - ");
+        document.getElementById("artista").textContent = partes[0] || "--";
+        document.getElementById("musica").textContent = partes[1] || "--";
 
-<script>
-let audio = document.getElementById("audio");
-let btn = document.getElementById("btn");
-
-function togglePlay() {
-  if (audio.paused) {
-    audio.play();
-    btn.innerText = "⏸️ Pause";
-  } else {
-    audio.pause();
-    btn.innerText = "▶️ Play";
-  }
-}
-
-// 🔥 API DA RÁDIO
-async function atualizarPlayer() {
-  try {
-    const res = await fetch("https://api.allorigins.win/raw?url=http://igng.com.br/api-json/TnpBeE9BPT0rWg==");
-    const data = await res.json();
-
-    let musicaCompleta = data.musica || "Desconhecido";
-
-    let partes = musicaCompleta.split(" - ");
-    let artista = partes[0] || "Desconhecido";
-    let musica = partes[1] || musicaCompleta;
-
-    document.getElementById("artista").innerText = artista;
-    document.getElementById("musica").innerHTML =
-      `<span class="marquee">${musica}</span>`;
-
-    document.getElementById("status").innerText = data.status;
-    document.getElementById("ouvintes").innerText = data.ouvintes;
-
-    buscarCapa(artista, musica);
-
-  } catch (e) {
-    console.log("Erro API:", e);
-  }
-}
-
-// 🍎 BUSCAR CAPA NA APPLE MUSIC (iTunes API)
-async function buscarCapa(artista, musica) {
-  try {
-    let termo = encodeURIComponent(artista + " " + musica);
-
-    let url = `https://itunes.apple.com/search?term=${termo}&entity=song&limit=1`;
-
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (data.results.length > 0) {
-      let capa = data.results[0].artworkUrl100.replace("100x100", "500x500");
-      document.getElementById("cover").src = capa;
+        document.getElementById("capa").src =
+          xml.getElementsByTagName("capa_musica")[0].textContent;
+      } catch (e) {
+        console.error("Erro ao carregar API", e);
+      }
     }
 
-  } catch (e) {
-    console.log("Erro capa:", e);
-  }
-}
-
-// 🔄 Atualização automática
-setInterval(atualizarPlayer, 10000);
-atualizarPlayer();
-</script>
-
+    carregarInfo();
+    setInterval(carregarInfo, 15000); // atualiza a cada 15s
+  </script>
 </body>
 </html>

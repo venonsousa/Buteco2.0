@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Player Rádio PRO</title>
+<title>Rádio Player PRO</title>
 
 <style>
 body {
@@ -12,28 +12,27 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #111;
-  font-family: Arial, sans-serif;
+  background: #0f0f0f;
+  font-family: Arial;
 }
 
 .player {
   width: 320px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
   padding: 20px;
+  border-radius: 20px;
   text-align: center;
   color: #fff;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
 }
 
 .capa {
   width: 200px;
   height: 200px;
-  margin: 0 auto 15px;
   border-radius: 50%;
   overflow: hidden;
-  animation: girar 10s linear infinite;
+  margin: auto;
+  animation: girar 12s linear infinite;
 }
 
 .capa img {
@@ -43,24 +42,20 @@ body {
 }
 
 @keyframes girar {
-  from { transform: rotate(0deg); }
+  from { transform: rotate(0); }
   to { transform: rotate(360deg); }
-}
-
-.info {
-  margin-top: 10px;
 }
 
 #artista {
   font-size: 14px;
   opacity: 0.7;
+  margin-top: 10px;
 }
 
 #musica {
-  font-size: 16px;
   font-weight: bold;
-  white-space: nowrap;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .marquee {
@@ -74,15 +69,12 @@ body {
   100% { transform: translateX(-100%); }
 }
 
-.controls {
-  margin-top: 15px;
-}
-
 button {
-  background: #00ffcc;
-  border: none;
+  margin-top: 15px;
   padding: 10px 20px;
   border-radius: 30px;
+  border: none;
+  background: #00ffcc;
   cursor: pointer;
   font-weight: bold;
 }
@@ -103,14 +95,10 @@ button {
     <img id="cover" src="https://via.placeholder.com/300">
   </div>
 
-  <div class="info">
-    <div id="artista">Artista</div>
-    <div id="musica"><span class="marquee">Nome da música</span></div>
-  </div>
+  <div id="artista">Artista</div>
+  <div id="musica"><span class="marquee">Carregando...</span></div>
 
-  <div class="controls">
-    <button onclick="togglePlay()">▶️ Play</button>
-  </div>
+  <button onclick="togglePlay()" id="btn">▶️ Play</button>
 
   <div class="stats">
     <div>Status: <span id="status">--</span></div>
@@ -119,23 +107,23 @@ button {
 
 </div>
 
-<audio id="audio" src="https://stm.igng.com.br:7018" preload="none"></audio>
+<audio id="audio" src="https://stm.igng.com.br:7018/stream"></audio>
 
 <script>
 let audio = document.getElementById("audio");
-let tocando = false;
+let btn = document.getElementById("btn");
 
 function togglePlay() {
-  if (tocando) {
-    audio.pause();
-    tocando = false;
-  } else {
+  if (audio.paused) {
     audio.play();
-    tocando = true;
+    btn.innerText = "⏸️ Pause";
+  } else {
+    audio.pause();
+    btn.innerText = "▶️ Play";
   }
 }
 
-// 🔥 API da rádio
+// 🔥 API DA RÁDIO
 async function atualizarPlayer() {
   try {
     const res = await fetch("https://api.allorigins.win/raw?url=http://igng.com.br/api-json/TnpBeE9BPT0rWg==");
@@ -144,11 +132,13 @@ async function atualizarPlayer() {
     let musicaCompleta = data.musica || "Desconhecido";
 
     let partes = musicaCompleta.split(" - ");
-    let artista = partes[0] || "";
+    let artista = partes[0] || "Desconhecido";
     let musica = partes[1] || musicaCompleta;
 
     document.getElementById("artista").innerText = artista;
-    document.getElementById("musica").innerHTML = '<span class="marquee">' + musica + '</span>';
+    document.getElementById("musica").innerHTML =
+      `<span class="marquee">${musica}</span>`;
+
     document.getElementById("status").innerText = data.status;
     document.getElementById("ouvintes").innerText = data.ouvintes;
 
@@ -159,17 +149,19 @@ async function atualizarPlayer() {
   }
 }
 
-// 🍎 Buscar capa (Apple Music / iTunes)
+// 🍎 BUSCAR CAPA NA APPLE MUSIC (iTunes API)
 async function buscarCapa(artista, musica) {
   try {
     let termo = encodeURIComponent(artista + " " + musica);
-    let url = https://itunes.apple.com/search?term=${termo}&entity=song&limit=1;
+
+    let url = `https://itunes.apple.com/search?term=${termo}&entity=song&limit=1`;
 
     const res = await fetch(url);
     const data = await res.json();
 
     if (data.results.length > 0) {
-      document.getElementById("cover").src = data.results[0].artworkUrl100.replace("100x100", "300x300");
+      let capa = data.results[0].artworkUrl100.replace("100x100", "500x500");
+      document.getElementById("cover").src = capa;
     }
 
   } catch (e) {
@@ -177,7 +169,7 @@ async function buscarCapa(artista, musica) {
   }
 }
 
-// atualizar automático
+// 🔄 Atualização automática
 setInterval(atualizarPlayer, 10000);
 atualizarPlayer();
 </script>

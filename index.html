@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Player Rádio</title>
+<title>Player Rádio PRO</title>
 
 <style>
 body {
@@ -29,7 +29,7 @@ body {
   color: #fff;
 }
 
-/* CAPA GIRANDO */
+/* CAPA */
 .capa {
   width: 230px;
   height: 230px;
@@ -41,24 +41,18 @@ body {
   animation-play-state: paused;
 }
 
-@keyframes girar {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 .playing .capa {
   animation-play-state: running;
 }
 
-/* TEXTO */
-.content {
-  padding: 20px;
+@keyframes girar {
+  to { transform: rotate(360deg); }
 }
 
-.artista {
-  font-size: 18px;
-  opacity: 0.7;
-}
+/* TEXTO */
+.content { padding: 20px; }
+
+.artista { font-size: 18px; opacity: 0.7; }
 
 .musica {
   font-size: 28px;
@@ -124,7 +118,7 @@ body {
   <div class="content">
     <div class="artista" id="artista">Carregando...</div>
     <div class="musica" id="musica">Carregando música...</div>
-    <div class="album" id="album">---</div>
+    <div class="album" id="album"></div>
 
     <div class="btn" onclick="togglePlay()" id="btn">
       <div class="icon"></div>
@@ -140,6 +134,8 @@ body {
 let audio = document.getElementById("audio");
 let player = document.getElementById("player");
 
+let ultimaBusca = "";
+
 /* PLAY */
 function togglePlay() {
   audio.paused ? audio.play() : audio.pause();
@@ -148,78 +144,74 @@ function togglePlay() {
 audio.onplay = () => player.classList.add("playing");
 audio.onpause = () => player.classList.remove("playing");
 
-/* APIs */
-const API_JSON = "https://api.codetabs.com/v1/proxy?quest=https://igng.com.br/api-json/VG5wQmVFOUJQVDA9KzM=";
-const API_XML = "https://api.codetabs.com/v1/proxy?quest=http://igng.com.br/api/TnpBeE9BPT0rWg==";
-const API_FALLBACK = "https://api.codetabs.com/v1/proxy?quest=http://igng.com.br/api-json/TnpBeE9BPT0rWg==";
+/* SEPARAR */
+function separar(texto) {
+  if (!texto) return { artista: "AO VIVO", musica: "Transmissão" };
 
-/* ATUALIZA PLAYER */
-function atualizar(artista, musica, album) {
-  document.getElementById("artista").innerText = artista || "AO VIVO";
-  document.getElementById("musica").innerText = musica || "Transmissão ao vivo";
-  document.getElementById("album").innerText = album ? "💿 " + album : "";
+  let partes = texto.split(" - ");
+
+  if (partes.length >= 2) {
+    return {
+      artista: partes[0].trim(),
+      musica: partes.slice(1).join(" - ").trim()
+    };
+  }
+
+  return { artista: "AO VIVO", musica: texto };
 }
 
-/* CAPA */
-function carregarCapa() {
-  fetch(API_JSON)
+/* BUSCAR CAPA NA APPLE (iTunes API) */
+function buscarCapa(artista, musica) {
+
+  let query = encodeURIComponent(artista + " " + musica);
+
+  fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=1`)
     .then(r => r.json())
     .then(data => {
-      if (data.capa_musica) {
-        document.getElementById("capa").style.backgroundImage =
-          `url(${data.capa_musica})`;
+
+      if (data.results && data.results.length > 0) {
+
+        let item = data.results[0];
+
+        let capa = item.artworkUrl100.replace("100x100", "500x500");
+
+        document.getElementById("capa").style.backgroundImage = `url(${capa})`;
+        document.getElementById("album").innerText = "💿 " + item.collectionName;
+
       }
     })
     .catch(()=>{});
 }
 
-/* INFO COM FALLBACK */
-function carregarInfo() {
+/* API RÁDIO */
+const API = "https://api.codetabs.com/v1/proxy?quest=https://igng.com.br/api-json/VG5wQmVFOUJQVDA9KzM=";
 
-  fetch(API_XML)
-    .then(r => r.text())
-    .then(str => {
+function carregar() {
+  fetch(API)
+    .then(r => r.json())
+    .then(data => {
 
-      let xml = new DOMParser().parseFromString(str, "text/xml");
+      let texto = data.musica_atual;
 
-      let artista = xml.querySelector("artista")?.textContent;
-      let musica  = xml.querySelector("musica")?.textContent;
-      let album   = xml.querySelector("album")?.textContent;
+      let info = separar(texto);
 
-      if (musica) {
-        atualizar(artista, musica, album);
-      } else {
-        throw "erro";
+      document.getElementById("artista").innerText = info.artista;
+      document.getElementById("musica").innerText = info.musica;
+
+      let chave = info.artista + info.musica;
+
+      if (chave !== ultimaBusca) {
+        ultimaBusca = chave;
+        buscarCapa(info.artista, info.musica);
       }
 
     })
-    .catch(() => {
-
-      fetch(API_FALLBACK)
-        .then(r => r.json())
-        .then(data => {
-
-          let texto = data.musica_atual || "";
-
-          let partes = texto.split(" - ");
-
-          let artista = partes[0] || "AO VIVO";
-          let musica  = partes[1] || texto;
-
-          atualizar(artista, musica, data.album);
-        });
-
-    });
+    .catch(()=>{});
 }
 
 /* LOOP */
-setInterval(() => {
-  carregarCapa();
-  carregarInfo();
-}, 3000);
-
-carregarCapa();
-carregarInfo();
+setInterval(carregar, 4000);
+carregar();
 
 </script>
 

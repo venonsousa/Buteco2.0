@@ -515,6 +515,63 @@
             0% { transform: translateY(0) scale(1); opacity: 1; }
             100% { transform: translateY(-40px) scale(1.5); opacity: 0; }
         }
+		#sonic_art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: girar 12s linear infinite;
+}
+
+@keyframes girar {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+#sonic_title {
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+    position: relative;
+}
+
+#sonic_title span {
+    display: inline-block;
+    padding-left: 100%;
+    animation: marquee 10s linear infinite;
+}
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}#sonic_art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: girar 12s linear infinite;
+}
+
+@keyframes girar {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+#sonic_title {
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+    position: relative;
+}
+
+#sonic_title span {
+    display: inline-block;
+    padding-left: 100%;
+    animation: marquee 10s linear infinite;
+}
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
 
     </style>
 </head>
@@ -603,9 +660,8 @@
     </div>
 
     <!-- Sonic / Doscast Scripts -->
-    <script id='sonic_js' data-port='8004' src='http://igng.com.br/api-json/TnpBeE9BPT0rWg=='></script>
-
-    <script>
+<script id='sonic_js' data-port='8004' src='https://igng.com.br/api-json/TnpBeE9BPT0rWg=='></script>    
+<script>
         // --- Elements ---
         const audio = document.getElementById('audio-stream');
         const mainPlayBtn = document.getElementById('main-play-btn');
@@ -787,7 +843,76 @@
                 }
             }, 1500);
         });
+// ===== API RADIO PRO =====
+const API_XML_EXTRA = "https://api.codetabs.com/v1/proxy?quest=http://igng.com.br/api/TnpBeE9BPT0rWg==";
 
+let ultimaMusica = "";
+
+async function getRadioInfo() {
+    try {
+        const response = await fetch(API_XML_EXTRA);
+        const data = await response.text();
+
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(data, "text/xml");
+
+        const musica = xml.getElementsByTagName("musica")[0]?.textContent || "Ao Vivo";
+
+        if (musica === ultimaMusica) return;
+        ultimaMusica = musica;
+
+        let artista = "";
+        let nomeMusica = musica;
+
+        if (musica.includes("-")) {
+            const partes = musica.split("-");
+            artista = partes[0].trim();
+            nomeMusica = partes[1].trim();
+        }
+
+        const texto = artista + " - " + nomeMusica;
+
+        document.getElementById("sonic_title").innerHTML = `<span>${texto}</span>`;
+
+        buscarCapa(artista, nomeMusica);
+
+    } catch (erro) {
+        console.log("Erro API:", erro);
+    }
+}
+
+// ===== CAPA APPLE MUSIC =====
+async function buscarCapa(artista, musica) {
+    try {
+        const query = encodeURIComponent(artista + " " + musica);
+        const url = `https://itunes.apple.com/search?term=${query}&entity=song&limit=1`;
+
+        const res = await fetch(url);
+        const json = await res.json();
+
+        let capa = "https://via.placeholder.com/300x300?text=SEM+CAPA";
+
+        if (json.results && json.results.length > 0) {
+            capa = json.results[0].artworkUrl100.replace("100x100", "500x500");
+        }
+
+        document.getElementById("sonic_art").innerHTML = `<img src="${capa}">`;
+
+    } catch (e) {
+        console.log("Erro capa:", e);
+    }
+}
+
+// AUTO UPDATE
+setInterval(getRadioInfo, 10000);
+getRadioInfo();
+
+// AUTOPLAY
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        audio.play().catch(() => {});
+    }, 2000);
+});
     </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"7cfebe8ad60d47299959edeae0ac1784","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>

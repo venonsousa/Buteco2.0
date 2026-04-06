@@ -27,8 +27,8 @@
       padding: 10px;
     }
     .cover {
-      width: 120px;
-      height: 100px;
+      width: 120px;   /* capa menor */
+      height: 100px;  /* capa menor */
       margin-right: 15px;
       flex-shrink: 0;
     }
@@ -48,8 +48,13 @@
       line-height: 1.4;
       font-size: 14px;
     }
-    .info h3 { margin: 5px 0; font-size: 16px; }
-    .info p { margin: 3px 0; }
+    .info h3 {
+      margin: 5px 0;
+      font-size: 16px;
+    }
+    .info p {
+      margin: 3px 0;
+    }
     .controls {
       display: flex;
       align-items: center;
@@ -70,7 +75,9 @@
       transition: transform 0.2s;
       box-shadow: 0 0 15px #fff, 0 0 30px #fff;
     }
-    .play-btn:hover { transform: scale(1.1); }
+    .play-btn:hover {
+      transform: scale(1.1);
+    }
     .volume {
       accent-color: #fff;
       box-shadow: 0 0 10px #fff, 0 0 20px #fff;
@@ -109,7 +116,9 @@
       box-shadow: 0 0 15px #fff, 0 0 30px #fff;
       transition: transform 0.3s;
     }
-    .gallery-btn img:hover { transform: scale(1.1); }
+    .gallery-btn img:hover {
+      transform: scale(1.1);
+    }
     .datetime {
       text-align: center;
       margin-top: 10px;
@@ -129,87 +138,11 @@
         <h3 id="titulo">Web Rádio</h3>
         <p><strong>Artista:</strong> <span id="artista">--</span></p>
         <p><strong>Música:</strong> <span id="musica">--</span></p>
+        <p><strong>Álbum:</strong> <span id="album">--</span></p>
         <p><strong>Ouvintes:</strong> <span id="ouvintes">1</span></p>
         <p><strong>Bitrate:</strong> <span id="bitrate">128Kbps</span></p>
       </div>
     </div>
     <div class="controls">
       <button id="playPause" class="play-btn">▶</button>
-      <input id="volume" class="volume" type="range" min="0" max="1" step="0.01" value="1">
-    </div>
-    <div class="socials">
-      <a href="https://instagram.com" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/instagram.svg" alt="Instagram"></a>
-      <a href="https://facebook.com" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/facebook.svg" alt="Facebook"></a>
-      <a href="https://x.com" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/x.svg" alt="X"></a>
-      <a href="https://t.me" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/telegram.svg" alt="Telegram"></a>
-    </div>
-    <div class="gallery-btn">
-      <a href="#" target="_blank"><img src="https://xatimg.com/image/1YAIzAbC2yzt.gif" alt="Galeria"></a>
-    </div>
-    <div class="datetime" id="datetime"></div>
-    <audio id="audio" autoplay>
-      <source src="https://stm.igng.com.br:7018/stream" type="audio/mpeg">
-      Seu navegador não suporta áudio HTML5.
-    </audio>
-  </div>
-
-  <script>
-    const audio = document.getElementById("audio");
-    const playPauseBtn = document.getElementById("playPause");
-    const volumeSlider = document.getElementById("volume");
-
-    playPauseBtn.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play();
-        playPauseBtn.textContent = "❚❚";
-      } else {
-        audio.pause();
-        playPauseBtn.textContent = "▶";
-      }
-    });
-
-    volumeSlider.addEventListener("input", () => {
-      audio.volume = volumeSlider.value;
-    });
-
-    async function buscarCapaAppleMusic(artista, musica) {
-      const token = "SEU_TOKEN_APPLE"; // substitua pelo seu token válido
-      const query = encodeURIComponent(`${artista} ${musica}`);
-      try {
-        const resposta = await fetch(
-          `https://api.music.apple.com/v1/catalog/br/search?term=${query}&types=songs`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const dados = await resposta.json();
-        if (dados.results.songs && dados.results.songs.data.length > 0) {
-          const song = dados.results.songs.data[0];
-          const capaUrl = song.attributes.artwork.url
-            .replace('{w}', '300')
-            .replace('{h}', '300');
-          document.getElementById("capa").src = capaUrl;
-
-          if ('mediaSession' in navigator) {
-            navigator.mediaSession.metadata = new MediaMetadata({
-              title: musica,
-              artist: artista,
-              album: song.attributes.albumName || "Web Rádio",
-              artwork: [{ src: capaUrl, sizes: "300x300", type: "image/jpeg" }]
-            });
-          }
-        }
-      } catch (e) {
-        console.error("Erro ao buscar capa no Apple Music:", e);
-      }
-    }
-
-    function atualizarInfo() {
-      $.ajax({
-        url: 'https://igng.com.br/api/NzAxOCsx',
-        dataType: 'xml',
-        success: function(xml) {
-          const musicaAtual = $(xml).find('musica_atual').text();
-          const ouvintes = $(xml).find('ouvintes_conectados').text();
-
-          const partes = musicaAtual.split(" - ");
-          const artista = partes[0] || "--";
-         Aqui
+     

@@ -34,13 +34,14 @@
       width: 100%;
       height: 100%;
       border-radius: 8px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.9); /* sombra preta forte */
+      box-shadow: 0 0 20px rgba(0,0,0,0.9);
     }
     .info {
       flex: 1;
       background: rgba(0,0,0,0.6);
       padding: 10px;
       border-radius: 8px;
+      margin-top: 20px; /* desce as informações */
     }
     .controls {
       display: flex;
@@ -59,7 +60,7 @@
       font-size: 18px;
       font-weight: bold;
       transition: background 0.3s, transform 0.2s;
-      box-shadow: 0 0 15px rgba(0,0,0,0.8); /* sombra preta */
+      box-shadow: 0 0 15px rgba(0,0,0,0.8);
     }
     .play-btn:hover {
       background: #999;
@@ -67,7 +68,7 @@
     }
     .volume {
       margin-left: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.7); /* sombra preta no slider */
+      box-shadow: 0 0 10px rgba(0,0,0,0.7);
     }
     .socials {
       display: flex;
@@ -78,7 +79,7 @@
       height: 24px;
       filter: invert(1);
       transition: transform 0.3s ease, filter 0.3s ease;
-      box-shadow: 0 0 10px rgba(0,0,0,0.7); /* sombra preta nos ícones */
+      box-shadow: 0 0 10px rgba(0,0,0,0.7);
       border-radius: 50%;
       padding: 3px;
       background: rgba(0,0,0,0.4);
@@ -95,13 +96,13 @@
       <div class="cover">
         <img id="capa" src="" alt="Capa da música">
       </div>
-      <div class="info">
-        <h3 id="titulo">Carregando rádio...</h3>
-        <p><strong>Artista:</strong> <span id="artista">--</span></p>
-        <p><strong>Música:</strong> <span id="musica">--</span></p>
-        <p><strong>Ouvintes:</strong> <span id="ouvintes">--</span></p>
-        <p><strong>Bitrate:</strong> <span id="bitrate">--</span> kbps</p>
-      </div>
+    </div>
+    <div class="info">
+      <h3 id="titulo">Web Rádio</h3>
+      <p><strong>Artista:</strong> <span id="artista">--</span></p>
+      <p><strong>Música:</strong> <span id="musica">--</span></p>
+      <p><strong>Ouvintes:</strong> <span id="ouvintes">--</span></p>
+      <p><strong>Bitrate:</strong> <span id="bitrate">128Kbps</span></p>
     </div>
     <div class="controls">
       <button id="playPause" class="play-btn">▶</button>
@@ -143,13 +144,9 @@
         url: 'https://igng.com.br/api/NzAxOCsx',
         dataType: 'xml',
         success: function(xml) {
-          const titulo = $(xml).find('titulo').text();
           const musicaAtual = $(xml).find('musica_atual').text();
           const capa = $(xml).find('capa_musica').text();
           const ouvintes = $(xml).find('ouvintes_conectados').text();
-          const bitrate = $(xml).find('plano_bitrate').text();
-
-          $("#titulo").text(titulo);
 
           const partes = musicaAtual.split(" - ");
           $("#artista").text(partes[0] || "--");
@@ -157,7 +154,8 @@
 
           $("#capa").attr("src", capa);
           $("#ouvintes").text(ouvintes);
-          $("#bitrate").text(bitrate);
+          // Bitrate fixo 128Kbps
+          $("#bitrate").text("128Kbps");
         }
       });
     }

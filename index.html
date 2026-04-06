@@ -117,15 +117,18 @@
       audio.volume = volumeSlider.value;
     });
 
-    // Função para buscar foto do artista na Apple Music
+    // Função para buscar foto do artista na Apple Music (iTunes Search API)
     function buscarFotoAppleMusic(artista) {
       $.ajax({
         url: `https://itunes.apple.com/search?term=${encodeURIComponent(artista)}&entity=musicArtist`,
         dataType: 'jsonp', // Apple exige JSONP
         success: function(data) {
           if (data.results && data.results.length > 0) {
-            const imagem = data.results[0].artworkUrl100.replace("100x100", "300x300");
+            // artworkUrl100 é pequeno, vamos trocar para 600x600
+            const imagem = data.results[0].artworkUrl100.replace("100x100", "600x600");
             $("#capa").attr("src", imagem);
+          } else {
+            $("#capa").attr("src", ""); // limpa se não encontrar
           }
         }
       });
@@ -164,13 +167,9 @@
       const agora = new Date();
       const opcoes = { timeZone: "America/Sao_Paulo", hour12: false };
       const data = agora.toLocaleDateString("pt-BR", opcoes);
-      const hora = agora.toLocaleTimeString("pt-BR", opcoes);
-      document.getElementById("datetime").textContent = `Data: ${data} | Hora: ${hora} (Brasília)`;
-    }
-    atualizarDataHora();
-    setInterval(atualizarDataHoraPerfeito, VenOn! Vamos juntar a busca da **Apple Music (iTunes Search API)** direto no seu player. Assim, sempre que a música mudar, ele vai consultar a Apple e atualizar a capa no canto inferior esquerdo.  
+      const hora = agora.toLocaleTimeString("pt-BR",Perfeito, VenOn! Vamos simplificar: deixei **apenas um player** e corrigi a função da capa para que ela realmente apareça usando a **API da Apple Music (iTunes Search API)**. O problema era que às vezes o retorno não trazia imagem, ou ficava no tamanho errado. Agora o código pega a imagem maior disponível (600x600) e aplica corretamente no canto inferior esquerdo.
 
-Aqui está o **HTML completo atualizado**:
+Aqui está o HTML final e limpo:
 
 ```html
 <!DOCTYPE html>
@@ -299,8 +298,10 @@ Aqui está o **HTML completo atualizado**:
         dataType: 'jsonp', // Apple exige JSONP
         success: function(data) {
           if (data.results && data.results.length > 0) {
-            const imagem = data.results[0].artworkUrl100.replace("100x100", "300x300");
+            const imagem = data.results[0].artworkUrl100.replace("100x100", "600x600");
             $("#capa").attr("src", imagem);
+          } else {
+            $("#capa").attr("src", "https://via.placeholder.com/182x155?text=Sem+Imagem");
           }
         }
       });
@@ -339,9 +340,4 @@ Aqui está o **HTML completo atualizado**:
       const agora = new Date();
       const opcoes = { timeZone: "America/Sao_Paulo", hour12: false };
       const data = agora.toLocaleDateString("pt-BR", opcoes);
-      const hora = agora.toLocaleTimeString("pt-BR", opcoes);
-      document.getElementById("datetime").textContent = `Data: ${data} | Hora: ${hora} (Brasília)`;
-    }
-    atualizarDataHora();
-    setInterval(atualizarDataHora, 1000);
-  </script
+     

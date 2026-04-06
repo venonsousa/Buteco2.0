@@ -20,31 +20,50 @@
       position: relative;
       box-sizing: border-box;
     }
-    .top { display: flex; flex-direction: row; align-items: flex-start; padding: 10px; }
-    .cover { width: 182px; height: 155px; margin-right: 15px; flex-shrink: 0; }
-    .cover img { width: 100%; height: 100%; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,1); object-fit: cover; }
-    .info { flex: 1; background: rgba(0,0,0,0.6); padding: 8px; border-radius: 8px; margin-top: 5px; line-height: 1.4; font-size: 14px; }
+    .top { padding: 10px; }
+    .info {
+      background: rgba(0,0,0,0.6);
+      padding: 8px;
+      border-radius: 8px;
+      line-height: 1.4;
+      font-size: 14px;
+    }
     .info h3 { margin: 5px 0; font-size: 16px; }
     .info p { margin: 3px 0; }
     .controls { display: flex; align-items: center; justify-content: center; margin-top: 15px; gap: 25px; }
-    .play-btn { background: #fff; border: none; color: #000; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; transition: transform 0.2s; box-shadow: 0 0 15px #fff, 0 0 30px #fff; }
+    .play-btn { background: #fff; border: none; color: #000; width: 50px; height: 50px; border-radius: 50%; cursor: pointer;
+      font-size: 16px; font-weight: bold; transition: transform 0.2s; box-shadow: 0 0 15px #fff, 0 0 30px #fff; }
     .play-btn:hover { transform: scale(1.1); }
     .volume { accent-color: #fff; box-shadow: 0 0 10px #fff, 0 0 20px #fff; width: 150px; }
     .socials { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
-    .socials a img { width: 22px; height: 22px; filter: invert(1); transition: transform 0.3s ease, filter 0.3s ease; box-shadow: 0 0 10px rgba(0,0,0,0.8); border-radius: 50%; padding: 3px; background: rgba(0,0,0,0.4); }
+    .socials a img { width: 22px; height: 22px; filter: invert(1); transition: transform 0.3s ease, filter 0.3s ease;
+      box-shadow: 0 0 10px rgba(0,0,0,0.8); border-radius: 50%; padding: 3px; background: rgba(0,0,0,0.4); }
     .socials a img:hover { transform: rotate(15deg) scale(1.2); filter: invert(0.5) sepia(1) hue-rotate(200deg); }
     .gallery-btn { display: flex; justify-content: center; margin-top: 10px; }
     .gallery-btn img { width: 60px; height: 60px; cursor: pointer; border-radius: 8px; box-shadow: 0 0 15px #fff, 0 0 30px #fff; transition: transform 0.3s; }
     .gallery-btn img:hover { transform: scale(1.1); }
     .datetime { text-align: center; margin-top: 10px; font-size: 14px; font-weight: bold; text-shadow: 0 0 10px #fff; }
+
+    /* capa fixa no canto inferior esquerdo */
+    .cover {
+      width: 182px;
+      height: 155px;
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+    }
+    .cover img {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0,0,0,1);
+      object-fit: cover;
+    }
   </style>
 </head>
 <body>
   <div class="player" id="player">
     <div class="top">
-      <div class="cover">
-        <img id="capa" src="" alt="Capa da música">
-      </div>
       <div class="info">
         <h3 id="titulo">Web Rádio</h3>
         <p><strong>Artista:</strong> <span id="artista">--</span></p>
@@ -53,6 +72,12 @@
         <p><strong>Bitrate:</strong> <span id="bitrate">128Kbps</span></p>
       </div>
     </div>
+
+    <!-- capa fixa no canto -->
+    <div class="cover">
+      <img id="capa" src="" alt="Capa da música">
+    </div>
+
     <div class="controls">
       <button id="playPause" class="play-btn">▶</button>
       <input id="volume" class="volume" type="range" min="0" max="1" step="0.01" value="1">

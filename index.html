@@ -13,13 +13,15 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      background: #111;
+      background: url('https://xatimg.com/image/EMsDSWDlogLy.png') no-repeat center center;
+      background-size: cover;
       color: #fff;
       font-family: Arial, sans-serif;
+      position: relative;
     }
     .cover {
       flex: 2;
-      background: #000;
+      background: rgba(0,0,0,0.5);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -28,6 +30,8 @@
       max-width: 100%;
       max-height: 100%;
       transition: transform 0.3s ease;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.7);
     }
     .cover img:hover {
       transform: scale(1.05);
@@ -35,6 +39,8 @@
     .info {
       flex: 1;
       padding: 10px;
+      background: rgba(0,0,0,0.6);
+      border-top: 1px solid #444;
     }
     .controls {
       display: flex;
@@ -117,22 +123,18 @@
       $.getJSON('http://igng.com.br/api-json/NzAxOCsx', function(data) {
         $("#titulo").text(data.titulo);
 
-        // Separar artista e música
         var partes = data.musica_atual.split(" - ");
         $("#artista").text(partes[0] || "--");
         $("#musica").text(partes[1] || "--");
 
-        // Atualizar capa
         $("#capa").attr("src", data.capa_musica);
-
-        // Ouvintes e bitrate
         $("#ouvintes").text(data.ouvintes_conectados);
         $("#bitrate").text(data.plano_bitrate);
       });
     }
 
     atualizarInfo();
-    setInterval(atualizarInfo, 15000); // atualiza a cada 15s
+    setInterval(atualizarInfo, 15000);
   </script>
 </body>
 </html>

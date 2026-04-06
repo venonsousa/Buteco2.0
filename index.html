@@ -27,8 +27,8 @@
       padding: 10px;
     }
     .cover {
-      width: 120px;   /* capa menor */
-      height: 100px;  /* capa menor */
+      width: 182px;
+      height: 155px;
       margin-right: 15px;
       flex-shrink: 0;
     }
@@ -138,11 +138,82 @@
         <h3 id="titulo">Web Rádio</h3>
         <p><strong>Artista:</strong> <span id="artista">--</span></p>
         <p><strong>Música:</strong> <span id="musica">--</span></p>
-        <p><strong>Álbum:</strong> <span id="album">--</span></p>
         <p><strong>Ouvintes:</strong> <span id="ouvintes">1</span></p>
         <p><strong>Bitrate:</strong> <span id="bitrate">128Kbps</span></p>
       </div>
     </div>
     <div class="controls">
       <button id="playPause" class="play-btn">▶</button>
-     
+      <input id="volume" class="volume" type="range" min="0" max="1" step="0.01" value="1">
+    </div>
+    <div class="socials">
+      <a href="https://instagram.com" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/instagram.svg" alt="Instagram"></a>
+      <a href="https://facebook.com" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/facebook.svg" alt="Facebook"></a>
+      <a href="https://x.com" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/x.svg" alt="X"></a>
+      <a href="https://t.me" target="_blank"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/telegram.svg" alt="Telegram"></a>
+    </div>
+    <div class="gallery-btn">
+      <a href="#" target="_blank"><img src="https://xatimg.com/image/1YAIzAbC2yzt.gif" alt="Galeria"></a>
+    </div>
+    <div class="datetime" id="datetime"></div>
+    <audio id="audio" autoplay>
+      <source src="https://stm.igng.com.br:7018/stream" type="audio/mpeg">
+      Seu navegador não suporta áudio HTML5.
+    </audio>
+  </div>
+
+  <script>
+    const audio = document.getElementById("audio");
+    const playPauseBtn = document.getElementById("playPause");
+    const volumeSlider = document.getElementById("volume");
+
+    playPauseBtn.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+        playPauseBtn.textContent = "❚❚";
+      } else {
+        audio.pause();
+        playPauseBtn.textContent = "▶";
+      }
+    });
+
+    volumeSlider.addEventListener("input", () => {
+      audio.volume = volumeSlider.value;
+    });
+
+    function atualizarInfo() {
+      $.ajax({
+        url: 'https://igng.com.br/api/NzAxOCsx',
+        dataType: 'xml',
+        success: function(xml) {
+          const musicaAtual = $(xml).find('musica_atual').text();
+          const capa = $(xml).find('capa_musica').text();
+          const ouvintes = $(xml).find('ouvintes_conectados').text();
+
+          const partes = musicaAtual.split(" - ");
+          $("#artista").text(partes[0] || "--");
+          $("#musica").text(partes[1] || "--");
+
+          $("#capa").attr("src", capa);
+          $("#ouvintes").text(ouvintes);
+          $("#bitrate").text("128Kbps");
+        }
+      });
+    }
+
+    atualizarInfo();
+    setInterval(atualizarInfo, 5000);
+
+    // Atualizar data e hora em tempo real (Horário de Brasília)
+    function atualizarDataHora() {
+      const agora = new Date();
+      const opcoes = { timeZone: "America/Sao_Paulo", hour12: false };
+      const data = agora.toLocaleDateString("pt-BR", opcoes);
+      const hora = agora.toLocaleTimeString("pt-BR", opcoes);
+      document.getElementById("datetime").textContent = `Data: ${data} | Hora: ${hora} (Brasília)`;
+    }
+    atualizarDataHora();
+    setInterval(atualizarDataHora, 1000);
+  </script>
+</body>
+</html>

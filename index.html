@@ -59,7 +59,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 25px;
+      margin-top: 15px;
       gap: 25px;
     }
     .play-btn {
@@ -87,7 +87,7 @@
       display: flex;
       gap: 10px;
       justify-content: center;
-      margin-top: 15px;
+      margin-top: 10px;
     }
     .socials a img {
       width: 22px;
@@ -106,7 +106,7 @@
     .gallery-btn {
       display: flex;
       justify-content: center;
-      margin-top: 15px;
+      margin-top: 10px;
     }
     .gallery-btn img {
       width: 60px;
@@ -212,16 +212,15 @@
       const hora = agora.toLocaleTimeString("pt-BR", opcoes);
       document.getElementById("datetime").textContent = `Data: ${data} | Hora: ${hora} (Brasília)`;
     }
-    atualizarDataHora();
-    setInterval(atualizarDataHora, 1000);
-  </scriptAqui está o **player final**, com todos os ajustes reunidos e organizados dentro da área, sem nada desalinhado:  
+    atualizarVocê está certo, na versão anterior acabei deixando **dois blocos de player** duplicados. Aqui está o **código corrigido com apenas um player**, bem organizado e com todos os elementos que você pediu:
 
 - **Capa** fixada em **182x155px**.  
 - **Botão play/pause** menor, em **neon branco**.  
 - **Controle de volume** também em **neon branco**.  
-- **Informações da rádio** compactadas (menos espaços).  
+- **Informações da rádio** compactadas.  
 - **Data e hora em tempo real (Horário de Brasília)**.  
-- Adicionado um **botão “Galeria”** usando a imagem que você forneceu.  
+- **Botão Galeria** usando a imagem que você forneceu.  
+- Layout limpo, sem duplicação.
 
 ```html
 <!DOCTYPE html>
@@ -285,7 +284,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 25px;
+      margin-top: 15px;
       gap: 25px;
     }
     .play-btn {
@@ -313,7 +312,7 @@
       display: flex;
       gap: 10px;
       justify-content: center;
-      margin-top: 15px;
+      margin-top: 10px;
     }
     .socials a img {
       width: 22px;
@@ -332,7 +331,7 @@
     .gallery-btn {
       display: flex;
       justify-content: center;
-      margin-top: 15px;
+      margin-top: 10px;
     }
     .gallery-btn img {
       width: 60px;
@@ -397,50 +396,4 @@
       if (audio.paused) {
         audio.play();
         playPauseBtn.textContent = "❚❚";
-      } else {
-        audio.pause();
-        playPauseBtn.textContent = "▶";
       }
-    });
-
-    volumeSlider.addEventListener("input", () => {
-      audio.volume = volumeSlider.value;
-    });
-
-    function atualizarInfo() {
-      $.ajax({
-        url: 'https://igng.com.br/api/NzAxOCsx',
-        dataType: 'xml',
-        success: function(xml) {
-          const musicaAtual = $(xml).find('musica_atual').text();
-          const capa = $(xml).find('capa_musica').text();
-          const ouvintes = $(xml).find('ouvintes_conectados').text();
-
-          const partes = musicaAtual.split(" - ");
-          $("#artista").text(partes[0] || "--");
-          $("#musica").text(partes[1] || "--");
-
-          $("#capa").attr("src", capa);
-          $("#ouvintes").text(ouvintes);
-          $("#bitrate").text("128Kbps");
-        }
-      });
-    }
-
-    atualizarInfo();
-    setInterval(atualizarInfo, 5000);
-
-    // Atualizar data e hora em tempo real (Horário de Brasília)
-    function atualizarDataHora() {
-      const agora = new Date();
-      const opcoes = { timeZone: "America/Sao_Paulo", hour12: false };
-      const data = agora.toLocaleDateString("pt-BR", opcoes);
-      const hora = agora.toLocaleTimeString("pt-BR", opcoes);
-      document.getElementById("datetime").textContent = `Data: ${data} | Hora: ${hora} (Brasília)`;
-    }
-    atualizarDataHora();
-    setInterval(atualizarDataHora, 1000);
-  </script>
-</body>
-</html>
-``
